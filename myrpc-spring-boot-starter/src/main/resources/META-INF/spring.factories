@@ -1,0 +1,5 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.jin.myrpc.spirngboot.MyRPCAutoConfiguration,\
+com.jin.myrpc.spirngboot.MyRPCProviderAutoConfiguration,\
+com.jin.myrpc.spirngboot.MyRPCConsumerAutoConfiguration
+
