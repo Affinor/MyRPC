@@ -1,6 +1,10 @@
 package com.jin.myrpc.spirngboot.consumer;
 
+import com.jin.myrpc.spirngboot.cluster.LeastActiveLoadBalance;
+import com.jin.myrpc.spirngboot.cluster.RandomLoadBalance;
 import com.jin.myrpc.spirngboot.protocol.RpcRequest;
+import com.jin.myrpc.spirngboot.registry.URL;
+import com.jin.myrpc.spirngboot.registry.ZkRegister;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -72,6 +76,7 @@ public class RpcProxy {
 			final RpcProxyHandler consumerHandler = new RpcProxyHandler();
 			EventLoopGroup group = new NioEventLoopGroup();
 			try {
+				URL select = new LeastActiveLoadBalance().select(new ZkRegister().lookup("/"+msg.getClassName()));
 				Bootstrap b = new Bootstrap();
 				b.group(group)
 						.channel(NioSocketChannel.class)
@@ -92,7 +97,7 @@ public class RpcProxy {
 							}
 						});
 
-				ChannelFuture future = b.connect("localhost", 8888).sync();
+				ChannelFuture future = b.connect(select.getServerAddress(), Integer.parseInt(select.getServerPort())).sync();
 				future.channel().writeAndFlush(msg).sync();
 				future.channel().closeFuture().sync();
 			} catch(Exception e){

@@ -53,6 +53,7 @@ public class RpcRegistry implements Runnable {
         }
     }
 
+    @Override
     public void run() {
         start();
     }

@@ -4,7 +4,10 @@ import com.jin.myrpc.spirngboot.annotation.EnableMyRPCConfiguration;
 import com.jin.myrpc.spirngboot.annotation.MyService;
 import com.jin.myrpc.spirngboot.registry.RegistryHandler;
 import com.jin.myrpc.spirngboot.registry.RpcRegistry;
+import com.jin.myrpc.spirngboot.registry.URL;
+import com.jin.myrpc.spirngboot.registry.ZkRegister;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -26,10 +29,13 @@ import java.util.concurrent.Executors;
 public class MyRPCProviderAutoConfiguration {
 
     //创建线程池对象
-    private static ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    private static ExecutorService executor = Executors.newFixedThreadPool(1);
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    @Value("${myrpc.port}")
+    private String serverPort;
 
     @PostConstruct
     public void init() throws Exception {
@@ -38,6 +44,13 @@ public class MyRPCProviderAutoConfiguration {
             for (Map.Entry<String, Object> entry : beanMap.entrySet()) {
                 this.initProviderBean(entry.getKey(), entry.getValue());
             }
+            URL url = new URL();
+            url.setServerAddress("localhost");
+            url.setServerPort(serverPort);
+            //开始注册
+            new ZkRegister().register(url);
+            executor.submit(new RpcRegistry(Integer.parseInt(serverPort)));
+            System.out.println("myrpc start:"+serverPort);
         }
     }
 
@@ -51,8 +64,6 @@ public class MyRPCProviderAutoConfiguration {
         String name = annotation.interfaceClass().getName();
         RegistryHandler.registryMap.put(key,value);
         RegistryHandler.registryMap.put(name,value);
-        executor.submit(new RpcRegistry(8888));
-        System.out.println("myrpc start:8888");
     }
 
 }

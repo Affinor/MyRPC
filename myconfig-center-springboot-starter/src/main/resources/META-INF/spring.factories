@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.jin.myconfig.center.spirngboot.MyConfigCenterAutoConfiguration,\
+com.jin.myconfig.center.spirngboot.config.ZkConfigCenter,\
+com.jin.myconfig.center.spirngboot.datasource.DynamicDataSource

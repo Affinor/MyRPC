@@ -11,6 +11,7 @@
     <modules>
         <module>myrpc-api</module>
         <module>myrpc-spring-boot-starter</module>
+        <module>myconfig-center-springboot-starter</module>
     </modules>
     <properties>
         <netty.version>4.1.42.Final</netty.version>
